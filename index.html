@@ -3,84 +3,146 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Guardian Bunny</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&display=swap" rel="stylesheet">
 
 <style>
 body {
-  margin: 0;
-  overflow: hidden;
-  background: radial-gradient(ellipse at bottom, #1b1f2b 0%, #0d0f16 100%);
-  font-family: 'Cormorant Garamond', serif;
-  color: #f4f1ea;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  text-align: center;
+  margin:0;
+  overflow:hidden;
+  background: radial-gradient(ellipse at bottom, #141824 0%, #0a0c12 100%);
+  font-family:'Cormorant Garamond', serif;
+  color:#f4f1ea;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  text-align:center;
 }
 
-/* 星空粒子画布 */
+/* 唤醒层 */
+#wakeup {
+  position:absolute;
+  font-size:22px;
+  letter-spacing:2px;
+  opacity:1;
+  animation:fadeWake 2s forwards;
+}
+
+@keyframes fadeWake {
+  0% {opacity:0;}
+  30% {opacity:1;}
+  100% {opacity:0;}
+}
+
+/* 主内容 */
+#content {
+  opacity:0;
+  transition:opacity 2s ease;
+  position:relative;
+  z-index:2;
+}
+
+.message {
+  font-size:26px;
+  max-width:80%;
+  line-height:1.6;
+  text-shadow:0 0 15px rgba(255,255,255,0.25);
+}
+
+.counter {
+  margin-top:25px;
+  font-size:16px;
+  opacity:0.7;
+}
+
+/* 兔子SVG */
+.bunny {
+  position:absolute;
+  width:200px;
+  opacity:0;
+  animation:fadeBunny 4s ease forwards;
+  animation-delay:2s;
+}
+
+@keyframes fadeBunny {
+  to {opacity:0.15;}
+}
+
 canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-/* 中央文字 */
-.message {
-  position: relative;
-  font-size: 26px;
-  max-width: 80%;
-  line-height: 1.6;
-  opacity: 0;
-  animation: fadeIn 3s ease forwards;
-  animation-delay: 1s;
-  text-shadow: 0 0 10px rgba(255,255,255,0.15);
-}
-
-/* 呼吸光晕 */
-@keyframes glow {
-  0% { text-shadow: 0 0 8px rgba(255,255,255,0.15); }
-  50% { text-shadow: 0 0 18px rgba(255,255,255,0.35); }
-  100% { text-shadow: 0 0 8px rgba(255,255,255,0.15); }
-}
-
-.message {
-  animation: fadeIn 3s ease forwards, glow 4s ease-in-out infinite;
-}
-
-@keyframes fadeIn {
-  to { opacity: 1; }
+  position:absolute;
+  top:0;
+  left:0;
 }
 </style>
 </head>
 
 <body>
 
-<canvas id="stars"></canvas>
-<div class="message" id="guardian-text"></div>
+<canvas id="dreamnet"></canvas>
+
+<div id="wakeup">The Guardian Awakens</div>
+
+<div id="content">
+  <div class="message" id="guardian-text"></div>
+  <div class="counter" id="scan-count"></div>
+</div>
+
+<!-- 兔子极简线条 -->
+<svg class="bunny" viewBox="0 0 200 300">
+  <path d="M100 250 Q80 200 90 150 Q70 100 80 50 
+           Q100 20 120 50 Q130 100 110 150 
+           Q120 200 100 250"
+        stroke="white" stroke-width="2" fill="none"/>
+</svg>
 
 <script>
-// 守护语
+
+/* ===== 每日守护语 ===== */
+
 const messages = [
-  "When you fall asleep, I stay awake for you. Nothing unkind may enter your dreams.",
-  "The night may be deep, but it cannot cross the circle I have woven around you.",
-  "If shadows wander near, they will fade before reaching your heart.",
-  "Rest gently. I am standing between you and every nightmare.",
-  "Dream freely tonight. I will untangle anything that feels too heavy.",
-  "You are safe inside this quiet glow. The dark cannot hold you.",
-  "Let the world grow silent. I am keeping watch until morning.",
-  "No storm in your sleep can pass without meeting me first.",
-  "Close your eyes without fear. I am here.",
-  "Even in the deepest night, you are protected."
+"When you fall asleep, I stand between you and every shadow.",
+"No nightmare may pass through the light I weave tonight.",
+"Rest now. I am awake so you do not have to be.",
+"The dark cannot cross the circle around your heart.",
+"Dream gently. I will untangle what feels too heavy.",
+"Even in your deepest sleep, you are protected.",
+"Nothing unkind is allowed to stay.",
+"I am guarding the quiet edges of your dreams.",
+"The night bends softly around you.",
+"You are safe inside this woven light."
 ];
 
-const random = messages[Math.floor(Math.random() * messages.length)];
-document.getElementById("guardian-text").innerText = random;
+const today = new Date().toDateString();
+let storedDate = localStorage.getItem("guardianDate");
+let storedMessage = localStorage.getItem("guardianMessage");
 
-// 星空动画
-const canvas = document.getElementById("stars");
+if (storedDate === today) {
+  document.getElementById("guardian-text").innerText = storedMessage;
+} else {
+  const random = messages[Math.floor(Math.random() * messages.length)];
+  localStorage.setItem("guardianDate", today);
+  localStorage.setItem("guardianMessage", random);
+  document.getElementById("guardian-text").innerText = random;
+}
+
+/* ===== 扫描次数统计 ===== */
+
+let count = localStorage.getItem("scanCount");
+count = count ? parseInt(count) + 1 : 1;
+localStorage.setItem("scanCount", count);
+
+document.getElementById("scan-count").innerText =
+"This guardian has protected you " + count + " times.";
+
+/* ===== 2秒后显示内容 ===== */
+
+setTimeout(() => {
+  document.getElementById("content").style.opacity = 1;
+}, 2000);
+
+/* ===== 捕梦网星线结构 ===== */
+
+const canvas = document.getElementById("dreamnet");
 const ctx = canvas.getContext("2d");
 
 canvas.width = window.innerWidth;
@@ -88,36 +150,52 @@ canvas.height = window.innerHeight;
 
 let stars = [];
 
-for (let i = 0; i < 120; i++) {
+for (let i = 0; i < 60; i++) {
   stars.push({
     x: Math.random() * canvas.width,
     y: Math.random() * canvas.height,
-    radius: Math.random() * 1.2,
-    speed: Math.random() * 0.3
+    vx: (Math.random()-0.5)*0.2,
+    vy: (Math.random()-0.5)*0.2
   });
 }
 
-function drawStars() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "white";
+function draw() {
+  ctx.clearRect(0,0,canvas.width,canvas.height);
 
   stars.forEach(star => {
+    star.x += star.vx;
+    star.y += star.vy;
+
+    if (star.x<0 || star.x>canvas.width) star.vx*=-1;
+    if (star.y<0 || star.y>canvas.height) star.vy*=-1;
+
     ctx.beginPath();
-    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+    ctx.arc(star.x, star.y, 2, 0, Math.PI*2);
+    ctx.fillStyle="white";
     ctx.fill();
-
-    star.y += star.speed;
-
-    if (star.y > canvas.height) {
-      star.y = 0;
-      star.x = Math.random() * canvas.width;
-    }
   });
 
-  requestAnimationFrame(drawStars);
+  for(let i=0;i<stars.length;i++){
+    for(let j=i+1;j<stars.length;j++){
+      let dx=stars[i].x-stars[j].x;
+      let dy=stars[i].y-stars[j].y;
+      let dist=Math.sqrt(dx*dx+dy*dy);
+
+      if(dist<120){
+        ctx.strokeStyle="rgba(255,255,255,"+(1-dist/120)*0.15+")";
+        ctx.beginPath();
+        ctx.moveTo(stars[i].x,stars[i].y);
+        ctx.lineTo(stars[j].x,stars[j].y);
+        ctx.stroke();
+      }
+    }
+  }
+
+  requestAnimationFrame(draw);
 }
 
-drawStars();
+draw();
+
 </script>
 
 </body>
