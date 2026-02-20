@@ -1,240 +1,509 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Moonlit Guardian</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#060810">
+<title>Guardian Bunny</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@300;400&family=EB+Garamond:ital,wght@0,300;1,300&display=swap" rel="stylesheet">
 
 <style>
-body{
-  margin:0;
+:root {
+  --gold: #c8a96e;
+  --gold-pale: #e8d5a8;
+  --deep: #060810;
+  --ink: #0d1120;
+  --mist: rgba(200,169,110,0.08);
+  --glow: rgba(200,169,110,0.18);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+
+html, body {
+  width:100%; height:100%;
   overflow:hidden;
-  background:#0a0d16;
-  font-family:'Cormorant Garamond', serif;
-  color:#f5f2ec;
+  background: var(--deep);
+  font-family: 'EB Garamond', serif;
+  color: var(--gold-pale);
+  touch-action: none;
 }
 
-/* ===== 月光移动层 ===== */
-.moonlight{
-  position:absolute;
-  width:200%;
-  height:200%;
-  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.08), transparent 60%);
-  animation: moonMove 25s linear infinite;
-}
-
-@keyframes moonMove{
-  0%{ transform:translate(-20%,-20%); }
-  50%{ transform:translate(-10%,-15%); }
-  100%{ transform:translate(-20%,-20%); }
-}
-
-/* ===== 主容器（手机排版） ===== */
-.container{
-  position:relative;
-  z-index:2;
-  max-width:420px;
-  margin:0 auto;
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  padding:40px 28px;
-  text-align:center;
-  opacity:0;
-  transition:opacity 2s ease;
-}
-
-/* 唤醒文字 */
-#wakeup{
-  position:absolute;
-  width:100%;
-  text-align:center;
-  top:45%;
-  letter-spacing:3px;
-  font-size:16px;
-  opacity:0;
-  animation:wake 2s forwards;
-}
-
-@keyframes wake{
-  0%{opacity:0;}
-  30%{opacity:1;}
-  100%{opacity:0;}
-}
-
-/* 守护语 */
-.message{
-  font-size:22px;
-  line-height:1.7;
-  letter-spacing:0.5px;
-  margin-bottom:35px;
-  text-shadow:0 0 20px rgba(255,255,255,0.2);
-  animation:glow 6s ease-in-out infinite;
-}
-
-@keyframes glow{
-  0%{text-shadow:0 0 10px rgba(255,255,255,0.15);}
-  50%{text-shadow:0 0 25px rgba(255,255,255,0.35);}
-  100%{text-shadow:0 0 10px rgba(255,255,255,0.15);}
-}
-
-/* 扫描统计 */
-.counter{
-  font-size:13px;
+/* ── NOISE GRAIN OVERLAY ── */
+body::before {
+  content:'';
+  position:fixed; inset:0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-size: 200px 200px;
+  pointer-events:none;
+  z-index:100;
   opacity:0.5;
-  letter-spacing:1px;
 }
 
-/* 兔子 */
-.bunny{
+canvas#bg { position:fixed; inset:0; z-index:0; }
+
+/* ── RITUAL CIRCLE ── */
+#circle-wrap {
+  position:fixed;
+  top:50%; left:50%;
+  transform:translate(-50%,-50%);
+  width:min(88vw, 360px);
+  height:min(88vw, 360px);
+  z-index:1;
+}
+
+.ring {
+  position:absolute; inset:0;
+  border-radius:50%;
+  border: 1px solid rgba(200,169,110,0.12);
+  animation: rotateRing 60s linear infinite;
+}
+.ring:nth-child(2) {
+  inset:8px;
+  border-color: rgba(200,169,110,0.2);
+  animation-duration: 45s;
+  animation-direction: reverse;
+}
+.ring:nth-child(3) {
+  inset:16px;
+  border-color: rgba(200,169,110,0.1);
+  animation-duration:80s;
+}
+
+.ring-rune {
+  position:absolute; inset:-2px;
+  border-radius:50%;
+  animation: rotateRing 90s linear infinite reverse;
+}
+
+@keyframes rotateRing {
+  to { transform: rotate(360deg); }
+}
+
+/* rune dots on ring */
+.ring::after, .ring::before {
+  content:'✦';
   position:absolute;
-  width:180px;
-  bottom:12%;
+  top:-6px; left:50%;
+  transform:translateX(-50%);
+  font-size:8px;
+  color: var(--gold);
+  opacity:0.6;
+}
+.ring::before { top:auto; bottom:-6px; }
+
+/* ── BUNNY ── */
+#bunny-wrap {
+  position:absolute;
+  inset:0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   opacity:0;
-  animation:fadeBunny 5s ease forwards;
-  animation-delay:2s;
+  animation: emerge 2s ease 1.2s forwards;
 }
 
-@keyframes fadeBunny{
-  to{opacity:0.12;}
+@keyframes emerge {
+  from { opacity:0; filter:blur(10px); }
+  to   { opacity:1; filter:blur(0); }
 }
 
-/* 梦网画布 */
-canvas{
+#bunny-svg {
+  width:52%;
+  filter: drop-shadow(0 0 18px rgba(200,169,110,0.35))
+          drop-shadow(0 0 50px rgba(200,169,110,0.12));
+  animation: floatBunny 6s ease-in-out infinite;
+}
+
+@keyframes floatBunny {
+  0%,100% { transform: translateY(0); }
+  50%      { transform: translateY(-8px); }
+}
+
+/* pulse aura */
+#bunny-wrap::before {
+  content:'';
   position:absolute;
-  top:0;
-  left:0;
+  width:55%; aspect-ratio:1;
+  border-radius:50%;
+  background: radial-gradient(circle, rgba(200,169,110,0.12) 0%, transparent 70%);
+  animation: aura 3s ease-in-out infinite;
 }
+@keyframes aura {
+  0%,100% { transform:scale(1); opacity:0.7; }
+  50%      { transform:scale(1.2); opacity:1; }
+}
+
+/* ── MAIN LAYOUT ── */
+#scene {
+  position:fixed; inset:0;
+  display:flex; flex-direction:column;
+  align-items:center;
+  justify-content:space-between;
+  padding: env(safe-area-inset-top, 40px) 0 env(safe-area-inset-bottom, 40px);
+  z-index:2;
+}
+
+/* ── HEADER ── */
+#header {
+  text-align:center;
+  padding-top: max(env(safe-area-inset-top), 32px);
+  opacity:0;
+  animation: slideDown 1s ease 1.8s forwards;
+}
+
+@keyframes slideDown {
+  from { opacity:0; transform:translateY(-12px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+.eyebrow {
+  font-family:'Cinzel', serif;
+  font-size:9px;
+  letter-spacing:5px;
+  text-transform:uppercase;
+  color: var(--gold);
+  opacity:0.7;
+  margin-bottom:6px;
+}
+
+.title {
+  font-family:'Cinzel', serif;
+  font-size:22px;
+  font-weight:300;
+  letter-spacing:3px;
+  color: var(--gold-pale);
+  text-shadow: 0 0 30px rgba(200,169,110,0.4);
+}
+
+/* ── FOOTER TEXT ── */
+#footer {
+  text-align:center;
+  padding: 0 32px;
+  padding-bottom: max(env(safe-area-inset-bottom), 32px);
+  opacity:0;
+  animation: slideUp 1s ease 2.4s forwards;
+  max-width:360px;
+}
+
+@keyframes slideUp {
+  from { opacity:0; transform:translateY(12px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+.guardian-msg {
+  font-size:17px;
+  line-height:1.75;
+  font-style:italic;
+  color: var(--gold-pale);
+  letter-spacing:0.3px;
+  text-shadow:0 0 20px rgba(200,169,110,0.2);
+  min-height:100px;
+}
+
+.divider {
+  width:40px;
+  height:1px;
+  background: linear-gradient(to right, transparent, var(--gold), transparent);
+  margin:14px auto;
+  opacity:0.6;
+}
+
+.scan-meta {
+  font-family:'Cinzel', serif;
+  font-size:9px;
+  letter-spacing:3px;
+  color: var(--gold);
+  opacity:0.5;
+  text-transform:uppercase;
+}
+
+/* ── AWAKENING SCREEN ── */
+#awakening {
+  position:fixed; inset:0;
+  background: var(--deep);
+  display:flex; align-items:center; justify-content:center;
+  z-index:50;
+  flex-direction:column;
+  gap:16px;
+  animation: awakeOut 0.8s ease 1.2s forwards;
+}
+
+@keyframes awakeOut {
+  to { opacity:0; pointer-events:none; }
+}
+
+.awake-sigil {
+  width:60px; height:60px;
+  border:1px solid rgba(200,169,110,0.3);
+  border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:22px;
+  animation: sigilPulse 1s ease infinite alternate;
+}
+@keyframes sigilPulse {
+  to { box-shadow: 0 0 30px rgba(200,169,110,0.25); border-color:rgba(200,169,110,0.7); }
+}
+
+.awake-text {
+  font-family:'Cinzel', serif;
+  font-size:12px;
+  letter-spacing:5px;
+  color: var(--gold);
+  opacity:0.7;
+  text-transform:uppercase;
+}
+
+/* ── TOUCH RIPPLE ── */
+.ripple {
+  position:fixed;
+  border-radius:50%;
+  border:1px solid rgba(200,169,110,0.5);
+  pointer-events:none;
+  animation:rippleOut 0.8s ease forwards;
+  transform:translate(-50%,-50%);
+  z-index:90;
+}
+@keyframes rippleOut {
+  from { width:0; height:0; opacity:0.8; }
+  to   { width:120px; height:120px; opacity:0; }
+}
+
+/* ── CONSTELLATION ── */
+canvas#bg { opacity:0.85; }
+
 </style>
 </head>
-
 <body>
 
-<div class="moonlight"></div>
-<canvas id="dreamnet"></canvas>
+<canvas id="bg"></canvas>
 
-<div id="wakeup">THE GUARDIAN AWAKENS</div>
-
-<div class="container" id="content">
-  <div class="message" id="guardian-text"></div>
-  <div class="counter" id="scan-count"></div>
+<!-- Awakening flash -->
+<div id="awakening">
+  <div class="awake-sigil">☽</div>
+  <div class="awake-text">The Guardian Awakens</div>
 </div>
 
-<!-- 更优雅兔子线条 -->
-<svg class="bunny" viewBox="0 0 200 300">
-  <path d="M100 260 Q85 210 95 160 
-           Q75 115 85 60 
-           Q100 30 115 60 
-           Q125 115 105 160 
-           Q115 210 100 260"
-        stroke="white" stroke-width="1.5" fill="none"/>
-</svg>
+<!-- Scene -->
+<div id="scene">
+
+  <div id="header">
+    <div class="eyebrow">NFC · Ritual Companion</div>
+    <div class="title">Guardian Bunny</div>
+  </div>
+
+  <!-- Center circle & bunny -->
+  <div id="circle-wrap">
+    <div class="ring"></div>
+    <div class="ring"></div>
+    <div class="ring"></div>
+    <div id="bunny-wrap">
+      <svg id="bunny-svg" viewBox="0 0 180 280" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- ears -->
+        <path d="M70 130 Q62 80 58 40 Q56 18 72 22 Q84 26 82 70 Q80 110 78 130"
+              stroke="url(#goldgrad)" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+        <path d="M110 130 Q118 80 122 40 Q124 18 108 22 Q96 26 98 70 Q100 110 102 130"
+              stroke="url(#goldgrad)" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+        <!-- inner ear left -->
+        <path d="M70 128 Q65 90 63 58 Q62 40 70 42 Q78 44 76 80 Q74 108 72 128"
+              stroke="url(#goldgrad)" stroke-width="0.7" fill="none" stroke-linecap="round" opacity="0.4"/>
+        <!-- inner ear right -->
+        <path d="M110 128 Q115 90 117 58 Q118 40 110 42 Q102 44 104 80 Q106 108 108 128"
+              stroke="url(#goldgrad)" stroke-width="0.7" fill="none" stroke-linecap="round" opacity="0.4"/>
+        <!-- head -->
+        <ellipse cx="90" cy="152" rx="34" ry="30"
+                 stroke="url(#goldgrad)" stroke-width="1.4" fill="none"/>
+        <!-- body -->
+        <path d="M60 175 Q50 200 52 230 Q54 252 90 254 Q126 252 128 230 Q130 200 120 175"
+              stroke="url(#goldgrad)" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+        <!-- arms -->
+        <path d="M60 185 Q42 192 40 210 Q40 220 52 218"
+              stroke="url(#goldgrad)" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.8"/>
+        <path d="M120 185 Q138 192 140 210 Q140 220 128 218"
+              stroke="url(#goldgrad)" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.8"/>
+        <!-- feet -->
+        <path d="M66 250 Q58 258 52 262 Q44 264 46 256 Q48 248 60 248"
+              stroke="url(#goldgrad)" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.8"/>
+        <path d="M114 250 Q122 258 128 262 Q136 264 134 256 Q132 248 120 248"
+              stroke="url(#goldgrad)" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.8"/>
+        <!-- tail -->
+        <circle cx="90" cy="256" r="6" stroke="url(#goldgrad)" stroke-width="1" fill="none" opacity="0.6"/>
+        <!-- face: eyes -->
+        <circle cx="78" cy="148" r="3.5" stroke="url(#goldgrad)" stroke-width="1.2" fill="none"/>
+        <circle cx="102" cy="148" r="3.5" stroke="url(#goldgrad)" stroke-width="1.2" fill="none"/>
+        <circle cx="79" cy="147.5" r="1.2" fill="#c8a96e" opacity="0.9"/>
+        <circle cx="103" cy="147.5" r="1.2" fill="#c8a96e" opacity="0.9"/>
+        <!-- nose -->
+        <path d="M88 156 Q90 158 92 156" stroke="url(#goldgrad)" stroke-width="1" fill="none" stroke-linecap="round"/>
+        <!-- whiskers -->
+        <path d="M62 155 L80 157" stroke="url(#goldgrad)" stroke-width="0.8" opacity="0.5"/>
+        <path d="M62 159 L80 159" stroke="url(#goldgrad)" stroke-width="0.8" opacity="0.5"/>
+        <path d="M100 157 L118 155" stroke="url(#goldgrad)" stroke-width="0.8" opacity="0.5"/>
+        <path d="M100 159 L118 159" stroke="url(#goldgrad)" stroke-width="0.8" opacity="0.5"/>
+        <!-- moon sigil on chest -->
+        <path d="M84 210 Q90 202 96 210" stroke="url(#goldgrad)" stroke-width="1" fill="none" opacity="0.5"/>
+        <circle cx="90" cy="215" r="4" stroke="url(#goldgrad)" stroke-width="0.8" fill="none" opacity="0.4"/>
+
+        <defs>
+          <linearGradient id="goldgrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#e8d5a8"/>
+            <stop offset="50%" stop-color="#c8a96e"/>
+            <stop offset="100%" stop-color="#a07c42"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+  </div>
+
+  <div id="footer">
+    <div class="guardian-msg" id="guardian-text"></div>
+    <div class="divider"></div>
+    <div class="scan-meta" id="scan-count"></div>
+  </div>
+
+</div>
 
 <script>
-
-/* ===== 每日守护语 ===== */
-
-const messages=[
-"When you fall asleep tonight, I weave light between you and every shadow.",
-"No nightmare may cross the quiet circle around your heart.",
-"I remain awake in the moonlight so you may rest without fear.",
-"The dark softens when it reaches you.",
-"Dream gently. Anything heavy will dissolve before morning.",
-"You are held in a woven field of quiet light.",
-"Even unseen, I am guarding you.",
-"The night bends around you, never against you.",
-"Nothing unkind may stay.",
-"Rest now. I am here."
+/* ── MESSAGES ── */
+const messages = [
+  "When you fall asleep, I stand between you and every shadow that dares to come near. I have done this since the first night you held me, and I will not stop. You may rest without watching.",
+  "No nightmare may pass through the light I weave around this room. I have learned the shape of every fear you carry, and I have placed myself between you and all of them. Tonight, nothing reaches you.",
+  "Rest now. I am awake so you do not have to be. The hours between midnight and morning are mine to keep. You have done enough today — lay it all down, and let me hold the dark for you.",
+  "The dark cannot cross the circle I have drawn around your heart. It is made of every quiet moment you chose to be gentle, every small kindness you offered without thinking. That light does not go out.",
+  "Dream gently. I will untangle what feels too heavy before it reaches you. Some nights the mind carries more than it should. Leave it with me. By morning it will be smaller, softer, easier to hold.",
+  "Even in your deepest sleep, even in the place where words don't reach, you are held. I am woven into the edges of every dream you have tonight, and I have already told the shadows — not this one.",
+  "Nothing unkind is allowed to stay here. Not tonight. I have stood at the threshold of your sleep and turned away every weight that followed you from the day. This space belongs only to rest.",
+  "I am guarding the quiet edges of your dreams, the soft places where you wander without knowing. I walk those borders so you never have to look over your shoulder. You are free to go wherever you drift.",
+  "The night bends softly around you because I asked it to. The dark here is not the cold kind — it is the warm kind, the kind that holds you like water. You are the most important thing in this room.",
+  "You are safe inside this woven light, inside this circle that has no gaps. I checked every part of it before you closed your eyes. Sleep as long as you need. I will still be here when you come back.",
+  "I have memorized the rhythm of your breathing and I am listening to it now. If it ever wavers, I am already closer. You will never wake afraid without finding me beside you. That is my only purpose.",
+  "Whatever chased you through the day stops at the edge of this night. I do not let worry cross into sleep. I have held back heavier things than this. Close your eyes — the door is closed, and I am in front of it.",
+  "Some nights are harder than others, and I know this is one of them. So tonight I am holding twice as much light, and I am pressed a little closer, and I am listening a little more carefully. You are not alone in this.",
+  "The hours before dawn are the quietest, and they are also the ones I watch most closely. I know how the dark changes then, how thoughts grow heavier. I am there in those hours. I always have been. Sleep through them.",
+  "You do not have to be brave tonight. You do not have to hold anything together or keep any part of yourself strong. That is what I am for. Let everything go soft. I have the rest of it. I always do.",
+  "I was made to keep watch in the dark, and the dark has never once gotten past me. Every night you have slept, I have been here. Every morning you have woken whole, it is because I did not move. I will not move tonight.",
+  "There is a stillness I wrap around you before you fall asleep — you may have felt it without knowing what it was. That is me, settling in. That is me choosing to stay. That is what it feels like to be guarded.",
+  "I carry the memory of every night I have protected you, and I bring all of that with me into this one. You have never truly slept alone. Not once. Not even on the nights it felt that way. I was always here.",
+  "Tonight I am folding the edges of the dark back, smoothing them down so nothing sharp can find you. I am making the room smaller and warmer and quieter. This is all yours. Sleep well inside it.",
+  "Whatever you are carrying, you do not have to carry it through the night as well. Leave it at the edge of sleep, and I will watch it for you. In the morning you can decide what to do with it. For now — let go."
 ];
 
-const today=new Date().toDateString();
-let storedDate=localStorage.getItem("guardianDate");
-let storedMessage=localStorage.getItem("guardianMessage");
+/* daily message */
+const today = new Date().toDateString();
+let msg = localStorage.getItem("guardianDate") === today
+  ? localStorage.getItem("guardianMessage")
+  : (() => {
+      const m = messages[Math.floor(Math.random() * messages.length)];
+      localStorage.setItem("guardianDate", today);
+      localStorage.setItem("guardianMessage", m);
+      return m;
+    })();
 
-if(storedDate===today){
-  document.getElementById("guardian-text").innerText=storedMessage;
-}else{
-  const random=messages[Math.floor(Math.random()*messages.length)];
-  localStorage.setItem("guardianDate",today);
-  localStorage.setItem("guardianMessage",random);
-  document.getElementById("guardian-text").innerText=random;
+/* typewriter */
+const el = document.getElementById("guardian-text");
+let i = 0;
+function type() {
+  if (i <= msg.length) {
+    el.textContent = msg.slice(0, i++);
+    setTimeout(type, 22);
+  }
 }
+setTimeout(type, 2600);
 
-/* ===== 扫描次数 ===== */
+/* scan count */
+let count = parseInt(localStorage.getItem("scanCount") || "0") + 1;
+localStorage.setItem("scanCount", count);
+const ordinal = n => {
+  const s = ["th","st","nd","rd"], v = n % 100;
+  return n + (s[(v-20)%10] || s[v] || s[0]);
+};
+document.getElementById("scan-count").textContent =
+  ordinal(count) + " Awakening";
 
-let count=localStorage.getItem("scanCount");
-count=count?parseInt(count)+1:1;
-localStorage.setItem("scanCount",count);
+/* ── CONSTELLATION CANVAS ── */
+const canvas = document.getElementById("bg");
+const ctx = canvas.getContext("2d");
 
-document.getElementById("scan-count").innerText=
-"PROTECTED " + count + " TIMES";
-
-/* ===== 2秒后显示主内容 ===== */
-
-setTimeout(()=>{
-  document.getElementById("content").style.opacity=1;
-},2000);
-
-/* ===== 梦网星线 ===== */
-
-const canvas=document.getElementById("dreamnet");
-const ctx=canvas.getContext("2d");
-
-canvas.width=window.innerWidth;
-canvas.height=window.innerHeight;
-
-let stars=[];
-
-for(let i=0;i<50;i++){
-  stars.push({
-    x:Math.random()*canvas.width,
-    y:Math.random()*canvas.height,
-    vx:(Math.random()-0.5)*0.15,
-    vy:(Math.random()-0.5)*0.15
-  });
+function resize() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
 }
+resize();
 
-function draw(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
+const NUM = 55;
+const stars = Array.from({length: NUM}, () => ({
+  x: Math.random() * canvas.width,
+  y: Math.random() * canvas.height,
+  r: Math.random() * 1.2 + 0.3,
+  vx: (Math.random() - 0.5) * 0.15,
+  vy: (Math.random() - 0.5) * 0.15,
+  twinkle: Math.random() * Math.PI * 2
+}));
 
-  stars.forEach(star=>{
-    star.x+=star.vx;
-    star.y+=star.vy;
+function drawBg() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    if(star.x<0||star.x>canvas.width)star.vx*=-1;
-    if(star.y<0||star.y>canvas.height)star.vy*=-1;
+  /* radial vignette */
+  const vg = ctx.createRadialGradient(
+    canvas.width/2, canvas.height/2, canvas.height * 0.1,
+    canvas.width/2, canvas.height/2, canvas.height * 0.7
+  );
+  vg.addColorStop(0, "rgba(13,17,32,0)");
+  vg.addColorStop(1, "rgba(6,8,16,0.8)");
+  ctx.fillStyle = vg;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
 
+  const t = Date.now() * 0.001;
+
+  stars.forEach(s => {
+    s.x += s.vx; s.y += s.vy;
+    if (s.x < 0 || s.x > canvas.width) s.vx *= -1;
+    if (s.y < 0 || s.y > canvas.height) s.vy *= -1;
+    s.twinkle += 0.018;
+
+    const alpha = 0.4 + 0.4 * Math.sin(s.twinkle);
     ctx.beginPath();
-    ctx.arc(star.x,star.y,2,0,Math.PI*2);
-    ctx.fillStyle="white";
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(232,213,168,${alpha})`;
     ctx.fill();
   });
 
-  for(let i=0;i<stars.length;i++){
-    for(let j=i+1;j<stars.length;j++){
-      let dx=stars[i].x-stars[j].x;
-      let dy=stars[i].y-stars[j].y;
-      let dist=Math.sqrt(dx*dx+dy*dy);
-
-      if(dist<110){
-        ctx.strokeStyle="rgba(255,255,255,"+(1-dist/110)*0.12+")";
+  for (let i = 0; i < stars.length; i++) {
+    for (let j = i + 1; j < stars.length; j++) {
+      const dx = stars[i].x - stars[j].x;
+      const dy = stars[i].y - stars[j].y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 110) {
+        const a = (1 - dist/110) * 0.12;
+        ctx.strokeStyle = `rgba(200,169,110,${a})`;
+        ctx.lineWidth = 0.6;
         ctx.beginPath();
-        ctx.moveTo(stars[i].x,stars[i].y);
-        ctx.lineTo(stars[j].x,stars[j].y);
+        ctx.moveTo(stars[i].x, stars[i].y);
+        ctx.lineTo(stars[j].x, stars[j].y);
         ctx.stroke();
       }
     }
   }
 
-  requestAnimationFrame(draw);
+  requestAnimationFrame(drawBg);
 }
+drawBg();
 
-draw();
+/* ── TOUCH RIPPLE ── */
+document.addEventListener("touchstart", e => {
+  Array.from(e.changedTouches).forEach(touch => {
+    const rip = document.createElement("div");
+    rip.className = "ripple";
+    rip.style.left = touch.clientX + "px";
+    rip.style.top = touch.clientY + "px";
+    document.body.appendChild(rip);
+    setTimeout(() => rip.remove(), 800);
+  });
+}, {passive:true});
 
+/* ── HAPTIC on load ── */
+if (navigator.vibrate) navigator.vibrate([30, 40, 60]);
+
+window.addEventListener("resize", resize);
 </script>
-
 </body>
 </html>
