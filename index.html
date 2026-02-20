@@ -3,28 +3,54 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Guardian Bunny</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&display=swap" rel="stylesheet">
+
 <style>
 body {
   margin: 0;
-  height: 100vh;
+  overflow: hidden;
+  background: radial-gradient(ellipse at bottom, #1b1f2b 0%, #0d0f16 100%);
+  font-family: 'Cormorant Garamond', serif;
+  color: #f4f1ea;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: radial-gradient(circle at center, #f4f1ea, #e8e2d8);
-  font-family: 'Cormorant Garamond', serif;
+  height: 100vh;
   text-align: center;
-  padding: 30px;
+}
+
+/* 星空粒子画布 */
+canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* 中央文字 */
+.message {
+  position: relative;
+  font-size: 26px;
+  max-width: 80%;
+  line-height: 1.6;
+  opacity: 0;
+  animation: fadeIn 3s ease forwards;
+  animation-delay: 1s;
+  text-shadow: 0 0 10px rgba(255,255,255,0.15);
+}
+
+/* 呼吸光晕 */
+@keyframes glow {
+  0% { text-shadow: 0 0 8px rgba(255,255,255,0.15); }
+  50% { text-shadow: 0 0 18px rgba(255,255,255,0.35); }
+  100% { text-shadow: 0 0 8px rgba(255,255,255,0.15); }
 }
 
 .message {
-  font-size: 24px;
-  color: #5e5a54;
-  line-height: 1.6;
-  animation: fadeIn 2s ease-in;
+  animation: fadeIn 3s ease forwards, glow 4s ease-in-out infinite;
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
   to { opacity: 1; }
 }
 </style>
@@ -32,24 +58,66 @@ body {
 
 <body>
 
+<canvas id="stars"></canvas>
 <div class="message" id="guardian-text"></div>
 
 <script>
+// 守护语
 const messages = [
-  "Sleep gently. I am here with you.",
-  "No nightmare may pass tonight.",
-  "You are protected, even in the dark.",
-  "Rest now. I will keep watch.",
-  "Anything unkind will fade before it reaches you.",
-  "Let the night be soft around you.",
-  "You are safe inside this quiet circle.",
-  "Dream freely. I am holding the edges.",
-  "Nothing heavy is allowed to stay.",
-  "Close your eyes without fear."
+  "When you fall asleep, I stay awake for you. Nothing unkind may enter your dreams.",
+  "The night may be deep, but it cannot cross the circle I have woven around you.",
+  "If shadows wander near, they will fade before reaching your heart.",
+  "Rest gently. I am standing between you and every nightmare.",
+  "Dream freely tonight. I will untangle anything that feels too heavy.",
+  "You are safe inside this quiet glow. The dark cannot hold you.",
+  "Let the world grow silent. I am keeping watch until morning.",
+  "No storm in your sleep can pass without meeting me first.",
+  "Close your eyes without fear. I am here.",
+  "Even in the deepest night, you are protected."
 ];
 
 const random = messages[Math.floor(Math.random() * messages.length)];
 document.getElementById("guardian-text").innerText = random;
+
+// 星空动画
+const canvas = document.getElementById("stars");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let stars = [];
+
+for (let i = 0; i < 120; i++) {
+  stars.push({
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    radius: Math.random() * 1.2,
+    speed: Math.random() * 0.3
+  });
+}
+
+function drawStars() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "white";
+
+  stars.forEach(star => {
+    ctx.beginPath();
+    ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+    ctx.fill();
+
+    star.y += star.speed;
+
+    if (star.y > canvas.height) {
+      star.y = 0;
+      star.x = Math.random() * canvas.width;
+    }
+  });
+
+  requestAnimationFrame(drawStars);
+}
+
+drawStars();
 </script>
 
 </body>
