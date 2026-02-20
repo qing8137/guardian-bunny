@@ -6,365 +6,276 @@
 <meta name="theme-color" content="#060810">
 <title>Guardian Bunny</title>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@300;400&family=EB+Garamond:ital,wght@0,300;1,300&display=swap" rel="stylesheet">
-
 <style>
 :root {
-  --gold: #c8a96e;
-  --gold-pale: #e8d5a8;
-  --deep: #060810;
-  --ink: #0d1120;
-  --mist: rgba(200,169,110,0.08);
-  --glow: rgba(200,169,110,0.18);
+  --gold:#c8a96e; --gold-pale:#e8d5a8; --deep:#060810;
 }
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--deep);
+  font-family:'EB Garamond',serif;color:var(--gold-pale);touch-action:none;user-select:none;}
+body::before{content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  background-size:200px;pointer-events:none;z-index:200;opacity:0.5;}
+canvas#bg{position:fixed;inset:0;z-index:0;}
+canvas#particles{position:fixed;inset:0;z-index:1;pointer-events:none;}
+canvas#confetti{position:fixed;inset:0;z-index:50;pointer-events:none;}
 
-* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+/* AWAKENING */
+#awakening{position:fixed;inset:0;background:var(--deep);display:flex;align-items:center;
+  justify-content:center;z-index:150;flex-direction:column;gap:18px;
+  animation:awakeOut 0.9s ease 1.4s forwards;}
+@keyframes awakeOut{to{opacity:0;pointer-events:none;}}
+.awake-sigil{width:64px;height:64px;border-radius:50%;border:1px solid rgba(200,169,110,0.35);
+  display:flex;align-items:center;justify-content:center;font-size:26px;
+  animation:sigilPulse 0.9s ease-in-out infinite alternate;}
+@keyframes sigilPulse{to{box-shadow:0 0 36px rgba(200,169,110,0.3);border-color:rgba(200,169,110,0.8);}}
+.awake-text{font-family:'Cinzel',serif;font-size:10px;letter-spacing:5px;
+  color:var(--gold);opacity:0.7;text-transform:uppercase;}
 
-html, body {
-  width:100%; height:100%;
-  overflow:hidden;
-  background: var(--deep);
-  font-family: 'EB Garamond', serif;
-  color: var(--gold-pale);
-  touch-action: none;
-}
+/* SCENE */
+#scene{position:fixed;inset:0;z-index:2;display:flex;flex-direction:column;
+  align-items:center;justify-content:space-between;}
 
-/* ── NOISE GRAIN OVERLAY ── */
-body::before {
-  content:'';
-  position:fixed; inset:0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-  background-size: 200px 200px;
-  pointer-events:none;
-  z-index:100;
-  opacity:0.5;
-}
+/* HEADER */
+#header{text-align:center;padding-top:max(calc(env(safe-area-inset-top,0px) + 28px),36px);
+  opacity:0;animation:slideDown 1s ease 2s forwards;}
+@keyframes slideDown{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
+.eyebrow{font-family:'Cinzel',serif;font-size:9px;letter-spacing:5px;text-transform:uppercase;
+  color:var(--gold);opacity:0.65;margin-bottom:6px;}
+.title{font-family:'Cinzel',serif;font-size:22px;font-weight:300;letter-spacing:3px;
+  color:var(--gold-pale);text-shadow:0 0 30px rgba(200,169,110,0.45);}
+#mood-badge{margin-top:8px;font-style:italic;font-size:13px;color:var(--gold);opacity:0.7;letter-spacing:1px;}
 
-canvas#bg { position:fixed; inset:0; z-index:0; }
+/* CIRCLE */
+#circle-wrap{position:relative;width:min(82vw,320px);height:min(82vw,320px);flex-shrink:0;}
+.ring{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(200,169,110,0.13);
+  animation:rotateRing 60s linear infinite;transition:box-shadow 0.4s ease,border-color 0.4s ease;}
+.ring:nth-child(2){inset:8px;border-color:rgba(200,169,110,0.22);animation-duration:45s;animation-direction:reverse;}
+.ring:nth-child(3){inset:16px;border-color:rgba(200,169,110,0.1);animation-duration:80s;}
+.ring::after,.ring::before{content:'✦';position:absolute;top:-7px;left:50%;
+  transform:translateX(-50%);font-size:8px;color:var(--gold);opacity:0.55;}
+.ring::before{top:auto;bottom:-7px;}
+@keyframes rotateRing{to{transform:rotate(360deg);}}
+.ring.pulse{box-shadow:0 0 30px rgba(200,169,110,0.6),0 0 65px rgba(200,169,110,0.2);border-color:rgba(200,169,110,0.75);}
 
-/* ── RITUAL CIRCLE ── */
-#circle-wrap {
-  position:fixed;
-  top:50%; left:50%;
-  transform:translate(-50%,-50%);
-  width:min(88vw, 360px);
-  height:min(88vw, 360px);
-  z-index:1;
-}
+/* BLESSING OVERLAY */
+#blessing-overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:10;}
+.blessing-word{position:absolute;font-family:'Cinzel',serif;font-size:10px;letter-spacing:3px;
+  color:var(--gold);opacity:0;text-transform:uppercase;animation:blessFloat 1.9s ease forwards;white-space:nowrap;}
+@keyframes blessFloat{
+  0%{opacity:0;transform:translate(-50%,-50%) translateY(10px) scale(0.85);}
+  30%{opacity:1;}
+  100%{opacity:0;transform:translate(-50%,-50%) translateY(-55px) scale(1.08);}}
 
-.ring {
-  position:absolute; inset:0;
-  border-radius:50%;
-  border: 1px solid rgba(200,169,110,0.12);
-  animation: rotateRing 60s linear infinite;
-}
-.ring:nth-child(2) {
-  inset:8px;
-  border-color: rgba(200,169,110,0.2);
-  animation-duration: 45s;
-  animation-direction: reverse;
-}
-.ring:nth-child(3) {
-  inset:16px;
-  border-color: rgba(200,169,110,0.1);
-  animation-duration:80s;
-}
+/* BUNNY */
+#bunny-wrap{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  opacity:0;animation:emerge 2s ease 1.3s forwards;cursor:pointer;}
+@keyframes emerge{from{opacity:0;filter:blur(10px)}to{opacity:1;filter:blur(0)}}
+#bunny-svg{width:52%;filter:drop-shadow(0 0 18px rgba(200,169,110,0.4)) drop-shadow(0 0 50px rgba(200,169,110,0.15));
+  animation:floatBunny 5.5s ease-in-out infinite;transform-origin:center bottom;}
+@keyframes floatBunny{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+#bunny-svg.bounce{animation:bunnyBounce 0.5s ease forwards,floatBunny 5.5s ease-in-out 0.5s infinite;}
+@keyframes bunnyBounce{
+  0%{transform:scale(1) translateY(0);}30%{transform:scale(1.13) translateY(-15px);}
+  60%{transform:scale(0.96) translateY(2px);}100%{transform:scale(1) translateY(0);}}
+#bunny-wrap::before{content:'';position:absolute;width:56%;aspect-ratio:1;border-radius:50%;
+  background:radial-gradient(circle,rgba(200,169,110,0.13) 0%,transparent 70%);
+  animation:aura 3.5s ease-in-out infinite;}
+@keyframes aura{0%,100%{transform:scale(1);opacity:0.7;}50%{transform:scale(1.22);opacity:1;}}
 
-.ring-rune {
-  position:absolute; inset:-2px;
-  border-radius:50%;
-  animation: rotateRing 90s linear infinite reverse;
-}
+/* FOOTER */
+#footer{text-align:center;padding:0 30px;
+  padding-bottom:max(calc(env(safe-area-inset-bottom,0px) + 20px),32px);
+  opacity:0;animation:slideUp 1s ease 2.4s forwards;max-width:370px;width:100%;}
+@keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+#charm-row{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px;}
+.charm-symbol{font-size:18px;animation:charmSpin 8s linear infinite;display:inline-block;}
+@keyframes charmSpin{to{transform:rotate(360deg)}}
+.moon-symbol{font-size:16px;color:var(--gold);opacity:0.75;}
+.guardian-msg{font-size:16.5px;line-height:1.78;font-style:italic;color:var(--gold-pale);
+  letter-spacing:0.3px;text-shadow:0 0 20px rgba(200,169,110,0.2);min-height:90px;}
+.divider{width:40px;height:1px;background:linear-gradient(to right,transparent,var(--gold),transparent);
+  margin:12px auto;opacity:0.55;}
+.scan-meta{font-family:'Cinzel',serif;font-size:9px;letter-spacing:3px;color:var(--gold);opacity:0.45;text-transform:uppercase;}
 
-@keyframes rotateRing {
-  to { transform: rotate(360deg); }
-}
+/* RIPPLE */
+.ripple{position:fixed;border-radius:50%;border:1px solid rgba(200,169,110,0.55);pointer-events:none;
+  animation:rippleOut 0.9s ease forwards;transform:translate(-50%,-50%);z-index:90;}
+@keyframes rippleOut{from{width:0;height:0;opacity:0.9;}to{width:140px;height:140px;opacity:0;}}
 
-/* rune dots on ring */
-.ring::after, .ring::before {
-  content:'✦';
-  position:absolute;
-  top:-6px; left:50%;
-  transform:translateX(-50%);
-  font-size:8px;
-  color: var(--gold);
-  opacity:0.6;
-}
-.ring::before { top:auto; bottom:-6px; }
+/* SPARKLE */
+.sparkle{position:fixed;pointer-events:none;z-index:80;font-size:14px;
+  animation:sparkleFly 1s ease forwards;transform:translate(-50%,-50%);}
+@keyframes sparkleFly{
+  0%{opacity:1;transform:translate(-50%,-50%) scale(0.4);}
+  100%{opacity:0;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.3);}}
 
-/* ── BUNNY ── */
-#bunny-wrap {
-  position:absolute;
-  inset:0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  opacity:0;
-  animation: emerge 2s ease 1.2s forwards;
-}
-
-@keyframes emerge {
-  from { opacity:0; filter:blur(10px); }
-  to   { opacity:1; filter:blur(0); }
-}
-
-#bunny-svg {
-  width:52%;
-  filter: drop-shadow(0 0 18px rgba(200,169,110,0.35))
-          drop-shadow(0 0 50px rgba(200,169,110,0.12));
-  animation: floatBunny 6s ease-in-out infinite;
-}
-
-@keyframes floatBunny {
-  0%,100% { transform: translateY(0); }
-  50%      { transform: translateY(-8px); }
-}
-
-/* pulse aura */
-#bunny-wrap::before {
-  content:'';
-  position:absolute;
-  width:55%; aspect-ratio:1;
-  border-radius:50%;
-  background: radial-gradient(circle, rgba(200,169,110,0.12) 0%, transparent 70%);
-  animation: aura 3s ease-in-out infinite;
-}
-@keyframes aura {
-  0%,100% { transform:scale(1); opacity:0.7; }
-  50%      { transform:scale(1.2); opacity:1; }
-}
-
-/* ── MAIN LAYOUT ── */
-#scene {
-  position:fixed; inset:0;
-  display:flex; flex-direction:column;
-  align-items:center;
-  justify-content:space-between;
-  padding: env(safe-area-inset-top, 40px) 0 env(safe-area-inset-bottom, 40px);
-  z-index:2;
-}
-
-/* ── HEADER ── */
-#header {
-  text-align:center;
-  padding-top: max(env(safe-area-inset-top), 32px);
-  opacity:0;
-  animation: slideDown 1s ease 1.8s forwards;
-}
-
-@keyframes slideDown {
-  from { opacity:0; transform:translateY(-12px); }
-  to   { opacity:1; transform:translateY(0); }
-}
-
-.eyebrow {
-  font-family:'Cinzel', serif;
-  font-size:9px;
-  letter-spacing:5px;
-  text-transform:uppercase;
-  color: var(--gold);
-  opacity:0.7;
-  margin-bottom:6px;
-}
-
-.title {
-  font-family:'Cinzel', serif;
-  font-size:22px;
-  font-weight:300;
-  letter-spacing:3px;
-  color: var(--gold-pale);
-  text-shadow: 0 0 30px rgba(200,169,110,0.4);
-}
-
-/* ── FOOTER TEXT ── */
-#footer {
-  text-align:center;
-  padding: 0 32px;
-  padding-bottom: max(env(safe-area-inset-bottom), 32px);
-  opacity:0;
-  animation: slideUp 1s ease 2.4s forwards;
-  max-width:360px;
-}
-
-@keyframes slideUp {
-  from { opacity:0; transform:translateY(12px); }
-  to   { opacity:1; transform:translateY(0); }
-}
-
-.guardian-msg {
-  font-size:17px;
-  line-height:1.75;
-  font-style:italic;
-  color: var(--gold-pale);
-  letter-spacing:0.3px;
-  text-shadow:0 0 20px rgba(200,169,110,0.2);
-  min-height:100px;
-}
-
-.divider {
-  width:40px;
-  height:1px;
-  background: linear-gradient(to right, transparent, var(--gold), transparent);
-  margin:14px auto;
-  opacity:0.6;
-}
-
-.scan-meta {
-  font-family:'Cinzel', serif;
-  font-size:9px;
-  letter-spacing:3px;
-  color: var(--gold);
-  opacity:0.5;
-  text-transform:uppercase;
-}
-
-/* ── AWAKENING SCREEN ── */
-#awakening {
-  position:fixed; inset:0;
-  background: var(--deep);
-  display:flex; align-items:center; justify-content:center;
-  z-index:50;
-  flex-direction:column;
-  gap:16px;
-  animation: awakeOut 0.8s ease 1.2s forwards;
-}
-
-@keyframes awakeOut {
-  to { opacity:0; pointer-events:none; }
-}
-
-.awake-sigil {
-  width:60px; height:60px;
-  border:1px solid rgba(200,169,110,0.3);
-  border-radius:50%;
-  display:flex; align-items:center; justify-content:center;
-  font-size:22px;
-  animation: sigilPulse 1s ease infinite alternate;
-}
-@keyframes sigilPulse {
-  to { box-shadow: 0 0 30px rgba(200,169,110,0.25); border-color:rgba(200,169,110,0.7); }
-}
-
-.awake-text {
-  font-family:'Cinzel', serif;
-  font-size:12px;
-  letter-spacing:5px;
-  color: var(--gold);
-  opacity:0.7;
-  text-transform:uppercase;
-}
-
-/* ── TOUCH RIPPLE ── */
-.ripple {
-  position:fixed;
-  border-radius:50%;
-  border:1px solid rgba(200,169,110,0.5);
-  pointer-events:none;
-  animation:rippleOut 0.8s ease forwards;
-  transform:translate(-50%,-50%);
-  z-index:90;
-}
-@keyframes rippleOut {
-  from { width:0; height:0; opacity:0.8; }
-  to   { width:120px; height:120px; opacity:0; }
-}
-
-/* ── CONSTELLATION ── */
-canvas#bg { opacity:0.85; }
-
+/* TAP HINT */
+#tap-hint{position:absolute;bottom:-28px;left:50%;transform:translateX(-50%);
+  font-family:'Cinzel',serif;font-size:8px;letter-spacing:3px;color:var(--gold);
+  opacity:0;text-transform:uppercase;white-space:nowrap;
+  animation:hintFade 3s ease 4s forwards;}
+@keyframes hintFade{0%{opacity:0;}30%{opacity:0.5;}80%{opacity:0.5;}100%{opacity:0;}}
 </style>
 </head>
 <body>
 
 <canvas id="bg"></canvas>
+<canvas id="particles"></canvas>
+<canvas id="confetti"></canvas>
 
-<!-- Awakening flash -->
 <div id="awakening">
   <div class="awake-sigil">☽</div>
   <div class="awake-text">The Guardian Awakens</div>
 </div>
 
-<!-- Scene -->
 <div id="scene">
-
   <div id="header">
     <div class="eyebrow">NFC · Ritual Companion</div>
     <div class="title">Guardian Bunny</div>
+    <div id="mood-badge"></div>
   </div>
 
-  <!-- Center circle & bunny -->
   <div id="circle-wrap">
     <div class="ring"></div>
     <div class="ring"></div>
     <div class="ring"></div>
+    <div id="blessing-overlay"></div>
     <div id="bunny-wrap">
       <svg id="bunny-svg" viewBox="0 0 180 280" fill="none" xmlns="http://www.w3.org/2000/svg">
         <!-- ears -->
-        <path d="M70 130 Q62 80 58 40 Q56 18 72 22 Q84 26 82 70 Q80 110 78 130"
-              stroke="url(#goldgrad)" stroke-width="1.4" fill="none" stroke-linecap="round"/>
-        <path d="M110 130 Q118 80 122 40 Q124 18 108 22 Q96 26 98 70 Q100 110 102 130"
-              stroke="url(#goldgrad)" stroke-width="1.4" fill="none" stroke-linecap="round"/>
-        <!-- inner ear left -->
-        <path d="M70 128 Q65 90 63 58 Q62 40 70 42 Q78 44 76 80 Q74 108 72 128"
-              stroke="url(#goldgrad)" stroke-width="0.7" fill="none" stroke-linecap="round" opacity="0.4"/>
-        <!-- inner ear right -->
-        <path d="M110 128 Q115 90 117 58 Q118 40 110 42 Q102 44 104 80 Q106 108 108 128"
-              stroke="url(#goldgrad)" stroke-width="0.7" fill="none" stroke-linecap="round" opacity="0.4"/>
+        <path d="M70 130 Q62 80 58 40 Q56 18 72 22 Q84 26 82 70 Q80 110 78 130" stroke="url(#gg)" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+        <path d="M110 130 Q118 80 122 40 Q124 18 108 22 Q96 26 98 70 Q100 110 102 130" stroke="url(#gg)" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+        <path d="M70 128 Q65 90 63 58 Q62 40 70 42 Q78 44 76 80 Q74 108 72 128" stroke="url(#gg)" stroke-width="0.7" fill="none" stroke-linecap="round" opacity="0.4"/>
+        <path d="M110 128 Q115 90 117 58 Q118 40 110 42 Q102 44 104 80 Q106 108 108 128" stroke="url(#gg)" stroke-width="0.7" fill="none" stroke-linecap="round" opacity="0.4"/>
         <!-- head -->
-        <ellipse cx="90" cy="152" rx="34" ry="30"
-                 stroke="url(#goldgrad)" stroke-width="1.4" fill="none"/>
+        <ellipse cx="90" cy="152" rx="34" ry="30" stroke="url(#gg)" stroke-width="1.4" fill="none"/>
         <!-- body -->
-        <path d="M60 175 Q50 200 52 230 Q54 252 90 254 Q126 252 128 230 Q130 200 120 175"
-              stroke="url(#goldgrad)" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+        <path d="M60 175 Q50 200 52 230 Q54 252 90 254 Q126 252 128 230 Q130 200 120 175" stroke="url(#gg)" stroke-width="1.4" fill="none" stroke-linecap="round"/>
         <!-- arms -->
-        <path d="M60 185 Q42 192 40 210 Q40 220 52 218"
-              stroke="url(#goldgrad)" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.8"/>
-        <path d="M120 185 Q138 192 140 210 Q140 220 128 218"
-              stroke="url(#goldgrad)" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.8"/>
+        <path d="M60 185 Q42 192 40 210 Q40 220 52 218" stroke="url(#gg)" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.85"/>
+        <path d="M120 185 Q138 192 140 210 Q140 220 128 218" stroke="url(#gg)" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.85"/>
         <!-- feet -->
-        <path d="M66 250 Q58 258 52 262 Q44 264 46 256 Q48 248 60 248"
-              stroke="url(#goldgrad)" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.8"/>
-        <path d="M114 250 Q122 258 128 262 Q136 264 134 256 Q132 248 120 248"
-              stroke="url(#goldgrad)" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.8"/>
+        <path d="M66 250 Q58 258 52 262 Q44 264 46 256 Q48 248 60 248" stroke="url(#gg)" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.85"/>
+        <path d="M114 250 Q122 258 128 262 Q136 264 134 256 Q132 248 120 248" stroke="url(#gg)" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.85"/>
         <!-- tail -->
-        <circle cx="90" cy="256" r="6" stroke="url(#goldgrad)" stroke-width="1" fill="none" opacity="0.6"/>
-        <!-- face: eyes -->
-        <circle cx="78" cy="148" r="3.5" stroke="url(#goldgrad)" stroke-width="1.2" fill="none"/>
-        <circle cx="102" cy="148" r="3.5" stroke="url(#goldgrad)" stroke-width="1.2" fill="none"/>
-        <circle cx="79" cy="147.5" r="1.2" fill="#c8a96e" opacity="0.9"/>
-        <circle cx="103" cy="147.5" r="1.2" fill="#c8a96e" opacity="0.9"/>
-        <!-- nose -->
-        <path d="M88 156 Q90 158 92 156" stroke="url(#goldgrad)" stroke-width="1" fill="none" stroke-linecap="round"/>
-        <!-- whiskers -->
-        <path d="M62 155 L80 157" stroke="url(#goldgrad)" stroke-width="0.8" opacity="0.5"/>
-        <path d="M62 159 L80 159" stroke="url(#goldgrad)" stroke-width="0.8" opacity="0.5"/>
-        <path d="M100 157 L118 155" stroke="url(#goldgrad)" stroke-width="0.8" opacity="0.5"/>
-        <path d="M100 159 L118 159" stroke="url(#goldgrad)" stroke-width="0.8" opacity="0.5"/>
-        <!-- moon sigil on chest -->
-        <path d="M84 210 Q90 202 96 210" stroke="url(#goldgrad)" stroke-width="1" fill="none" opacity="0.5"/>
-        <circle cx="90" cy="215" r="4" stroke="url(#goldgrad)" stroke-width="0.8" fill="none" opacity="0.4"/>
+        <circle cx="90" cy="256" r="6" stroke="url(#gg)" stroke-width="1" fill="none" opacity="0.6"/>
+
+        <!-- FACE: happy (default) -->
+        <g id="face-happy">
+          <circle cx="78" cy="148" r="3.5" stroke="url(#gg)" stroke-width="1.2" fill="none"/>
+          <circle cx="102" cy="148" r="3.5" stroke="url(#gg)" stroke-width="1.2" fill="none"/>
+          <circle cx="79" cy="147.5" r="1.4" fill="#c8a96e" opacity="0.95"/>
+          <circle cx="103" cy="147.5" r="1.4" fill="#c8a96e" opacity="0.95"/>
+          <path d="M88 156 Q90 158 92 156" stroke="url(#gg)" stroke-width="1" fill="none" stroke-linecap="round"/>
+          <path d="M83 161 Q90 166 97 161" stroke="url(#gg)" stroke-width="1" fill="none" stroke-linecap="round" opacity="0.7"/>
+        </g>
+
+        <!-- FACE: sleepy -->
+        <g id="face-sleepy" opacity="0">
+          <path d="M74.5 148 Q78 144 81.5 148" stroke="url(#gg)" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+          <path d="M74.5 148 Q78 151.5 81.5 148" stroke="url(#gg)" stroke-width="0.7" fill="none" stroke-linecap="round" opacity="0.35"/>
+          <path d="M98.5 148 Q102 144 105.5 148" stroke="url(#gg)" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+          <path d="M98.5 148 Q102 151.5 105.5 148" stroke="url(#gg)" stroke-width="0.7" fill="none" stroke-linecap="round" opacity="0.35"/>
+          <text x="112" y="140" font-size="8" fill="#c8a96e" opacity="0.65" font-family="serif">z</text>
+          <text x="119" y="133" font-size="6" fill="#c8a96e" opacity="0.4" font-family="serif">z</text>
+          <ellipse cx="90" cy="162" rx="5" ry="3" stroke="url(#gg)" stroke-width="1" fill="none" opacity="0.6"/>
+        </g>
+
+        <!-- FACE: surprised -->
+        <g id="face-surprised" opacity="0">
+          <circle cx="78" cy="147" r="5.5" stroke="url(#gg)" stroke-width="1.3" fill="none"/>
+          <circle cx="102" cy="147" r="5.5" stroke="url(#gg)" stroke-width="1.3" fill="none"/>
+          <circle cx="79" cy="147" r="2.5" fill="#c8a96e" opacity="0.95"/>
+          <circle cx="103" cy="147" r="2.5" fill="#c8a96e" opacity="0.95"/>
+          <circle cx="77.5" cy="145.5" r="0.9" fill="white" opacity="0.8"/>
+          <circle cx="101.5" cy="145.5" r="0.9" fill="white" opacity="0.8"/>
+          <ellipse cx="90" cy="162" rx="4" ry="4.5" stroke="url(#gg)" stroke-width="1.2" fill="none" opacity="0.85"/>
+        </g>
+
+        <!-- FACE: content -->
+        <g id="face-content" opacity="0">
+          <path d="M74.5 150 Q78 144 81.5 150" stroke="url(#gg)" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+          <path d="M98.5 150 Q102 144 105.5 150" stroke="url(#gg)" stroke-width="1.6" fill="none" stroke-linecap="round"/>
+          <ellipse cx="70" cy="157" rx="6" ry="3.5" fill="#c8a96e" opacity="0.13"/>
+          <ellipse cx="110" cy="157" rx="6" ry="3.5" fill="#c8a96e" opacity="0.13"/>
+          <path d="M81 161 Q90 170 99 161" stroke="url(#gg)" stroke-width="1.2" fill="none" stroke-linecap="round" opacity="0.85"/>
+          <path d="M88 156 Q90 158 92 156" stroke="url(#gg)" stroke-width="1" fill="none" stroke-linecap="round"/>
+        </g>
+
+        <!-- whiskers always visible -->
+        <path d="M62 155 L80 157" stroke="url(#gg)" stroke-width="0.8" opacity="0.4"/>
+        <path d="M62 159 L80 159" stroke="url(#gg)" stroke-width="0.8" opacity="0.4"/>
+        <path d="M100 157 L118 155" stroke="url(#gg)" stroke-width="0.8" opacity="0.4"/>
+        <path d="M100 159 L118 159" stroke="url(#gg)" stroke-width="0.8" opacity="0.4"/>
+        <!-- moon sigil chest -->
+        <path d="M84 210 Q90 202 96 210" stroke="url(#gg)" stroke-width="1" fill="none" opacity="0.5"/>
+        <circle cx="90" cy="215" r="4" stroke="url(#gg)" stroke-width="0.8" fill="none" opacity="0.4"/>
 
         <defs>
-          <linearGradient id="goldgrad" x1="0" y1="0" x2="1" y2="1">
+          <linearGradient id="gg" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0%" stop-color="#e8d5a8"/>
             <stop offset="50%" stop-color="#c8a96e"/>
             <stop offset="100%" stop-color="#a07c42"/>
           </linearGradient>
         </defs>
       </svg>
+      <div id="tap-hint">tap me</div>
     </div>
   </div>
 
   <div id="footer">
+    <div id="charm-row">
+      <span class="charm-symbol" id="lucky-charm">✦</span>
+      <span class="moon-symbol" id="moon-phase"></span>
+    </div>
     <div class="guardian-msg" id="guardian-text"></div>
     <div class="divider"></div>
     <div class="scan-meta" id="scan-count"></div>
   </div>
-
 </div>
 
 <script>
+/* ── MOOD SYSTEM ── */
+const moods = [
+  { id:'sleepy',    label:'✦ Feeling Dreamy',   face:'face-sleepy',    charm:'☽', freq:396 },
+  { id:'happy',     label:'✦ Feeling Joyful',   face:'face-happy',     charm:'✿', freq:528 },
+  { id:'content',   label:'✦ Feeling Peaceful', face:'face-content',   charm:'❋', freq:432 },
+  { id:'surprised', label:'✦ Feeling Magical',  face:'face-surprised', charm:'★', freq:660 },
+];
+const moodDate = new Date().toDateString();
+let moodIdx = parseInt(localStorage.getItem('moodIdx')??'-1');
+if(localStorage.getItem('moodDay')!==moodDate){
+  moodIdx=Math.floor(Math.random()*moods.length);
+  localStorage.setItem('moodIdx',moodIdx);
+  localStorage.setItem('moodDay',moodDate);
+}
+const mood = moods[moodIdx];
+document.getElementById('mood-badge').textContent = mood.label;
+document.getElementById('lucky-charm').textContent = mood.charm;
+document.getElementById('face-happy').setAttribute('opacity','0');
+document.getElementById(mood.face).setAttribute('opacity','1');
+
+/* ── MOON PHASE ── */
+function getMoonPhase(){
+  const known=new Date(2000,0,6);
+  const diff=(new Date()-known)/(1000*60*60*24);
+  const phase=((diff%29.53)+29.53)%29.53;
+  if(phase<1.85)  return{s:'🌑',n:'New Moon'};
+  if(phase<5.53)  return{s:'🌒',n:'Waxing Crescent'};
+  if(phase<9.22)  return{s:'🌓',n:'First Quarter'};
+  if(phase<12.91) return{s:'🌔',n:'Waxing Gibbous'};
+  if(phase<16.61) return{s:'🌕',n:'Full Moon'};
+  if(phase<20.30) return{s:'🌖',n:'Waning Gibbous'};
+  if(phase<23.99) return{s:'🌗',n:'Last Quarter'};
+  return{s:'🌘',n:'Waning Crescent'};
+}
+const moon=getMoonPhase();
+const moonEl=document.getElementById('moon-phase');
+moonEl.textContent=moon.s; moonEl.title=moon.n;
+
 /* ── MESSAGES ── */
-const messages = [
+const messages=[
   "When you fall asleep, I stand between you and every shadow that dares to come near. I have done this since the first night you held me, and I will not stop. You may rest without watching.",
   "No nightmare may pass through the light I weave around this room. I have learned the shape of every fear you carry, and I have placed myself between you and all of them. Tonight, nothing reaches you.",
   "Rest now. I am awake so you do not have to be. The hours between midnight and morning are mine to keep. You have done enough today — lay it all down, and let me hold the dark for you.",
@@ -386,124 +297,229 @@ const messages = [
   "Tonight I am folding the edges of the dark back, smoothing them down so nothing sharp can find you. I am making the room smaller and warmer and quieter. This is all yours. Sleep well inside it.",
   "Whatever you are carrying, you do not have to carry it through the night as well. Leave it at the edge of sleep, and I will watch it for you. In the morning you can decide what to do with it. For now — let go."
 ];
-
-/* daily message */
-const today = new Date().toDateString();
-let msg = localStorage.getItem("guardianDate") === today
-  ? localStorage.getItem("guardianMessage")
-  : (() => {
-      const m = messages[Math.floor(Math.random() * messages.length)];
-      localStorage.setItem("guardianDate", today);
-      localStorage.setItem("guardianMessage", m);
-      return m;
-    })();
-
-/* typewriter */
-const el = document.getElementById("guardian-text");
-let i = 0;
-function type() {
-  if (i <= msg.length) {
-    el.textContent = msg.slice(0, i++);
-    setTimeout(type, 22);
-  }
-}
-setTimeout(type, 2600);
+const lastI=parseInt(localStorage.getItem("lastMsgIndex")??"-1");
+let idx; do{idx=Math.floor(Math.random()*messages.length);}while(idx===lastI);
+localStorage.setItem("lastMsgIndex",idx);
+const msg=messages[idx];
+const el=document.getElementById("guardian-text");
+let ci=0;
+function type(){if(ci<=msg.length){el.textContent=msg.slice(0,ci++);setTimeout(type,22);}}
+setTimeout(type,2700);
 
 /* scan count */
-let count = parseInt(localStorage.getItem("scanCount") || "0") + 1;
-localStorage.setItem("scanCount", count);
-const ordinal = n => {
-  const s = ["th","st","nd","rd"], v = n % 100;
-  return n + (s[(v-20)%10] || s[v] || s[0]);
-};
-document.getElementById("scan-count").textContent =
-  ordinal(count) + " Awakening";
+let count=parseInt(localStorage.getItem("scanCount")||"0")+1;
+localStorage.setItem("scanCount",count);
+const ordinal=n=>{const s=["th","st","nd","rd"],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0]);};
+document.getElementById("scan-count").textContent=ordinal(count)+" Awakening";
 
-/* ── CONSTELLATION CANVAS ── */
-const canvas = document.getElementById("bg");
-const ctx = canvas.getContext("2d");
-
-function resize() {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+/* ── WEB AUDIO ── */
+let audioCtx=null;
+function initAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();}
+function playChime(freq=528,dur=1.2){
+  if(!audioCtx)return;
+  const o=audioCtx.createOscillator(),g=audioCtx.createGain();
+  o.connect(g);g.connect(audioCtx.destination);
+  o.type='sine';o.frequency.setValueAtTime(freq,audioCtx.currentTime);
+  g.gain.setValueAtTime(0.001,audioCtx.currentTime);
+  g.gain.exponentialRampToValueAtTime(0.16,audioCtx.currentTime+0.05);
+  g.gain.exponentialRampToValueAtTime(0.001,audioCtx.currentTime+dur);
+  o.start();o.stop(audioCtx.currentTime+dur);
 }
-resize();
+function playChord(){[528,660,792].forEach((f,i)=>setTimeout(()=>playChime(f,1.5-i*0.1),i*90));}
 
-const NUM = 55;
-const stars = Array.from({length: NUM}, () => ({
-  x: Math.random() * canvas.width,
-  y: Math.random() * canvas.height,
-  r: Math.random() * 1.2 + 0.3,
-  vx: (Math.random() - 0.5) * 0.15,
-  vy: (Math.random() - 0.5) * 0.15,
-  twinkle: Math.random() * Math.PI * 2
-}));
-
-function drawBg() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-  /* radial vignette */
-  const vg = ctx.createRadialGradient(
-    canvas.width/2, canvas.height/2, canvas.height * 0.1,
-    canvas.width/2, canvas.height/2, canvas.height * 0.7
-  );
-  vg.addColorStop(0, "rgba(13,17,32,0)");
-  vg.addColorStop(1, "rgba(6,8,16,0.8)");
-  ctx.fillStyle = vg;
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-  const t = Date.now() * 0.001;
-
-  stars.forEach(s => {
-    s.x += s.vx; s.y += s.vy;
-    if (s.x < 0 || s.x > canvas.width) s.vx *= -1;
-    if (s.y < 0 || s.y > canvas.height) s.vy *= -1;
-    s.twinkle += 0.018;
-
-    const alpha = 0.4 + 0.4 * Math.sin(s.twinkle);
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(232,213,168,${alpha})`;
-    ctx.fill();
+/* ── BLESSING ANIMATION ── */
+const blessings=['Protected','Guarded','Blessed','Sheltered','Safe','Loved','Held','Watched','Cherished',moon.n];
+function showBlessing(){
+  const ov=document.getElementById('blessing-overlay');
+  const pick=[blessings[Math.floor(Math.random()*blessings.length)],
+              mood.charm+' '+mood.id];
+  pick.forEach((w,i)=>{
+    const sp=document.createElement('span');
+    sp.className='blessing-word';
+    sp.textContent=w;
+    const a=(i*150+20)*Math.PI/180;
+    sp.style.left=(50+35*Math.cos(a))+'%';
+    sp.style.top=(50+28*Math.sin(a))+'%';
+    sp.style.animationDelay=(i*0.25)+'s';
+    ov.appendChild(sp);
+    setTimeout(()=>sp.remove(),2400);
   });
+}
 
-  for (let i = 0; i < stars.length; i++) {
-    for (let j = i + 1; j < stars.length; j++) {
-      const dx = stars[i].x - stars[j].x;
-      const dy = stars[i].y - stars[j].y;
-      const dist = Math.sqrt(dx*dx + dy*dy);
-      if (dist < 110) {
-        const a = (1 - dist/110) * 0.12;
-        ctx.strokeStyle = `rgba(200,169,110,${a})`;
-        ctx.lineWidth = 0.6;
-        ctx.beginPath();
-        ctx.moveTo(stars[i].x, stars[i].y);
-        ctx.lineTo(stars[j].x, stars[j].y);
-        ctx.stroke();
-      }
-    }
+/* ── RING PULSE ── */
+function pulseRings(){
+  document.querySelectorAll('.ring').forEach(r=>{
+    r.classList.add('pulse');
+    setTimeout(()=>r.classList.remove('pulse'),900);
+  });
+}
+setTimeout(()=>{showBlessing();pulseRings();},2200);
+
+/* ── CONFETTI (first scan of day) ── */
+const cCanvas=document.getElementById('confetti');
+const cctx=cCanvas.getContext('2d');
+cCanvas.width=window.innerWidth; cCanvas.height=window.innerHeight;
+const todayStr=new Date().toDateString();
+if(localStorage.getItem('confettiDay')!==todayStr){
+  localStorage.setItem('confettiDay',todayStr);
+  setTimeout(launchConfetti,1900);
+}
+function launchConfetti(){
+  const p=Array.from({length:100},()=>({
+    x:Math.random()*cCanvas.width,y:-10,
+    r:Math.random()*6+3,vx:(Math.random()-0.5)*3.5,vy:Math.random()*4+2,
+    alpha:1,color:`hsl(${38+Math.random()*22},${55+Math.random()*35}%,${52+Math.random()*25}%)`,
+    spin:Math.random()*360,spinV:(Math.random()-0.5)*9,
+    shape:Math.random()>0.5?'star':'circle'
+  }));
+  function draw(){
+    cctx.clearRect(0,0,cCanvas.width,cCanvas.height);
+    let alive=false;
+    p.forEach(s=>{
+      s.x+=s.vx;s.y+=s.vy;s.vy+=0.06;s.spin+=s.spinV;s.alpha-=0.007;
+      if(s.alpha>0)alive=true;
+      cctx.save();cctx.globalAlpha=Math.max(0,s.alpha);
+      cctx.translate(s.x,s.y);cctx.rotate(s.spin*Math.PI/180);
+      cctx.fillStyle=s.color;
+      if(s.shape==='star'){drawStar(cctx,0,0,s.r*0.4,s.r,5);}
+      else{cctx.beginPath();cctx.arc(0,0,s.r,0,Math.PI*2);cctx.fill();}
+      cctx.restore();
+    });
+    if(alive)requestAnimationFrame(draw);
+    else cctx.clearRect(0,0,cCanvas.width,cCanvas.height);
   }
+  draw();
+}
+function drawStar(ctx,cx,cy,ir,or,pts){
+  ctx.beginPath();
+  for(let i=0;i<pts*2;i++){
+    const a=(i*Math.PI)/pts-Math.PI/2,r=i%2===0?or:ir;
+    i===0?ctx.moveTo(cx+r*Math.cos(a),cy+r*Math.sin(a)):ctx.lineTo(cx+r*Math.cos(a),cy+r*Math.sin(a));
+  }
+  ctx.closePath();ctx.fill();
+}
 
+/* ── FLOATING PARTICLES ── */
+const pCanvas=document.getElementById('particles');
+const pctx=pCanvas.getContext('2d');
+pCanvas.width=window.innerWidth;pCanvas.height=window.innerHeight;
+const CHARS=['✦','·','∘','✧','⋆','☽'];
+const parts=Array.from({length:38},()=>spawnPart());
+function spawnPart(bot=false){
+  return{x:pCanvas.width*0.25+Math.random()*pCanvas.width*0.5,
+    y:bot?pCanvas.height+10:Math.random()*pCanvas.height,
+    r:Math.random()*1.8+0.7,vy:-(Math.random()*0.5+0.18),vx:(Math.random()-0.5)*0.3,
+    alpha:Math.random()*0.5+0.2,life:Math.random(),max:0.6+Math.random()*0.6,
+    ch:CHARS[Math.floor(Math.random()*CHARS.length)],useChar:Math.random()>0.55};
+}
+function drawParticles(){
+  pctx.clearRect(0,0,pCanvas.width,pCanvas.height);
+  parts.forEach((p,i)=>{
+    p.x+=p.vx;p.y+=p.vy;p.life+=0.004;
+    if(p.life>p.max||p.y<-20)parts[i]=spawnPart(true);
+    const fade=Math.sin((p.life/p.max)*Math.PI);
+    pctx.globalAlpha=p.alpha*fade;
+    if(p.useChar){pctx.fillStyle='#c8a96e';pctx.font=`${p.r*7}px serif`;pctx.fillText(p.ch,p.x,p.y);}
+    else{pctx.beginPath();pctx.arc(p.x,p.y,p.r,0,Math.PI*2);pctx.fillStyle='#e8d5a8';pctx.fill();}
+  });
+  pctx.globalAlpha=1;
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+/* ── BACKGROUND + SHOOTING STARS ── */
+const bgC=document.getElementById('bg');
+const bctx=bgC.getContext('2d');
+bgC.width=window.innerWidth;bgC.height=window.innerHeight;
+const bgStars=Array.from({length:60},()=>({
+  x:Math.random()*bgC.width,y:Math.random()*bgC.height,
+  r:Math.random()*1.2+0.3,vx:(Math.random()-0.5)*0.12,vy:(Math.random()-0.5)*0.12,
+  tw:Math.random()*Math.PI*2
+}));
+const shoots=[];
+function spawnShoot(){
+  shoots.push({x:Math.random()*bgC.width*0.6,y:Math.random()*bgC.height*0.35,
+    vx:4+Math.random()*5,vy:1.5+Math.random()*3,tail:0,alpha:1});
+}
+setInterval(spawnShoot,5000+Math.random()*4000);
+setTimeout(spawnShoot,3500);
+function drawBg(){
+  bctx.clearRect(0,0,bgC.width,bgC.height);
+  const vg=bctx.createRadialGradient(bgC.width/2,bgC.height/2,bgC.height*0.08,bgC.width/2,bgC.height/2,bgC.height*0.72);
+  vg.addColorStop(0,'rgba(13,17,32,0)');vg.addColorStop(1,'rgba(6,8,16,0.85)');
+  bctx.fillStyle=vg;bctx.fillRect(0,0,bgC.width,bgC.height);
+  bgStars.forEach(s=>{
+    s.x+=s.vx;s.y+=s.vy;s.tw+=0.017;
+    if(s.x<0||s.x>bgC.width)s.vx*=-1;if(s.y<0||s.y>bgC.height)s.vy*=-1;
+    bctx.beginPath();bctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    bctx.fillStyle=`rgba(232,213,168,${0.35+0.4*Math.sin(s.tw)})`;bctx.fill();
+  });
+  for(let i=0;i<bgStars.length;i++)for(let j=i+1;j<bgStars.length;j++){
+    const dx=bgStars[i].x-bgStars[j].x,dy=bgStars[i].y-bgStars[j].y,d=Math.sqrt(dx*dx+dy*dy);
+    if(d<115){bctx.strokeStyle=`rgba(200,169,110,${(1-d/115)*0.11})`;bctx.lineWidth=0.5;
+      bctx.beginPath();bctx.moveTo(bgStars[i].x,bgStars[i].y);bctx.lineTo(bgStars[j].x,bgStars[j].y);bctx.stroke();}
+  }
+  for(let i=shoots.length-1;i>=0;i--){
+    const s=shoots[i];s.tail+=s.vx*1.4;s.x+=s.vx;s.y+=s.vy;
+    if(s.x>bgC.width||s.y>bgC.height){shoots.splice(i,1);continue;}
+    const g=bctx.createLinearGradient(s.x-s.tail,s.y-s.vy*(s.tail/s.vx||1),s.x,s.y);
+    g.addColorStop(0,'rgba(232,213,168,0)');g.addColorStop(1,`rgba(240,220,170,${Math.min(0.95,s.alpha)})`);
+    bctx.beginPath();bctx.moveTo(s.x-s.tail,s.y-s.vy*(s.tail/s.vx||1));bctx.lineTo(s.x,s.y);
+    bctx.strokeStyle=g;bctx.lineWidth=1.6;bctx.stroke();
+    bctx.beginPath();bctx.arc(s.x,s.y,2.2,0,Math.PI*2);
+    bctx.fillStyle=`rgba(250,235,185,${Math.min(1,s.alpha)})`;bctx.fill();
+  }
   requestAnimationFrame(drawBg);
 }
 drawBg();
 
-/* ── TOUCH RIPPLE ── */
-document.addEventListener("touchstart", e => {
-  Array.from(e.changedTouches).forEach(touch => {
-    const rip = document.createElement("div");
-    rip.className = "ripple";
-    rip.style.left = touch.clientX + "px";
-    rip.style.top = touch.clientY + "px";
-    document.body.appendChild(rip);
-    setTimeout(() => rip.remove(), 800);
+/* ── BUNNY TAP ── */
+const expressions=['face-happy','face-sleepy','face-surprised','face-content'];
+const tapFreqs=[528,396,660,432];
+let exprIdx=expressions.indexOf(mood.face);
+const bunnySvg=document.getElementById('bunny-svg');
+const bunnyWrap=document.getElementById('bunny-wrap');
+bunnyWrap.addEventListener('touchstart',onBunnyTap,{passive:true});
+bunnyWrap.addEventListener('click',onBunnyTap);
+function onBunnyTap(e){
+  e.stopPropagation();initAudio();
+  document.getElementById(expressions[exprIdx]).setAttribute('opacity','0');
+  exprIdx=(exprIdx+1)%expressions.length;
+  document.getElementById(expressions[exprIdx]).setAttribute('opacity','1');
+  bunnySvg.classList.remove('bounce');void bunnySvg.offsetWidth;bunnySvg.classList.add('bounce');
+  playChime(tapFreqs[exprIdx],1.3);
+  pulseRings();showBlessing();
+  const rect=bunnyWrap.getBoundingClientRect();
+  const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
+  ['✦','✧','⋆','∘','·','❋','☽','★'].forEach((ch,k)=>{
+    const sp=document.createElement('div');sp.className='sparkle';
+    const ang=(k/8)*Math.PI*2,dist=45+Math.random()*65;
+    sp.style.setProperty('--dx',(Math.cos(ang)*dist)+'px');
+    sp.style.setProperty('--dy',(Math.sin(ang)*dist)+'px');
+    sp.style.left=cx+'px';sp.style.top=cy+'px';
+    sp.style.animationDelay=(k*0.05)+'s';sp.style.color='#c8a96e';
+    sp.textContent=ch;document.body.appendChild(sp);
+    setTimeout(()=>sp.remove(),1200);
   });
-}, {passive:true});
+  if(navigator.vibrate)navigator.vibrate([15,10,25]);
+}
 
-/* ── HAPTIC on load ── */
-if (navigator.vibrate) navigator.vibrate([30, 40, 60]);
+/* ── TOUCH RIPPLE ── */
+document.addEventListener('touchstart',e=>{
+  initAudio();
+  Array.from(e.changedTouches).forEach(t=>{
+    const rip=document.createElement('div');rip.className='ripple';
+    rip.style.left=t.clientX+'px';rip.style.top=t.clientY+'px';
+    document.body.appendChild(rip);setTimeout(()=>rip.remove(),900);
+  });
+},{passive:true});
 
-window.addEventListener("resize", resize);
+/* ── LOAD ── */
+setTimeout(()=>{initAudio();playChord();if(navigator.vibrate)navigator.vibrate([30,40,60]);},1600);
+
+window.addEventListener('resize',()=>{
+  [bgC,pCanvas,cCanvas].forEach(c=>{c.width=window.innerWidth;c.height=window.innerHeight;});
+});
 </script>
 </body>
 </html>
