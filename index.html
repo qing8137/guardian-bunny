@@ -2,73 +2,108 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Guardian Bunny</title>
+<title>Moonlit Guardian</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400&display=swap" rel="stylesheet">
 
 <style>
-body {
+body{
   margin:0;
   overflow:hidden;
-  background: radial-gradient(ellipse at bottom, #141824 0%, #0a0c12 100%);
+  background:#0a0d16;
   font-family:'Cormorant Garamond', serif;
-  color:#f4f1ea;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-  text-align:center;
+  color:#f5f2ec;
 }
 
-/* 唤醒层 */
-#wakeup {
+/* ===== 月光移动层 ===== */
+.moonlight{
   position:absolute;
-  font-size:22px;
-  letter-spacing:2px;
-  opacity:1;
-  animation:fadeWake 2s forwards;
+  width:200%;
+  height:200%;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.08), transparent 60%);
+  animation: moonMove 25s linear infinite;
 }
 
-@keyframes fadeWake {
-  0% {opacity:0;}
-  30% {opacity:1;}
-  100% {opacity:0;}
+@keyframes moonMove{
+  0%{ transform:translate(-20%,-20%); }
+  50%{ transform:translate(-10%,-15%); }
+  100%{ transform:translate(-20%,-20%); }
 }
 
-/* 主内容 */
-#content {
-  opacity:0;
-  transition:opacity 2s ease;
+/* ===== 主容器（手机排版） ===== */
+.container{
   position:relative;
   z-index:2;
-}
-
-.message {
-  font-size:26px;
-  max-width:80%;
-  line-height:1.6;
-  text-shadow:0 0 15px rgba(255,255,255,0.25);
-}
-
-.counter {
-  margin-top:25px;
-  font-size:16px;
-  opacity:0.7;
-}
-
-/* 兔子SVG */
-.bunny {
-  position:absolute;
-  width:200px;
+  max-width:420px;
+  margin:0 auto;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  padding:40px 28px;
+  text-align:center;
   opacity:0;
-  animation:fadeBunny 4s ease forwards;
+  transition:opacity 2s ease;
+}
+
+/* 唤醒文字 */
+#wakeup{
+  position:absolute;
+  width:100%;
+  text-align:center;
+  top:45%;
+  letter-spacing:3px;
+  font-size:16px;
+  opacity:0;
+  animation:wake 2s forwards;
+}
+
+@keyframes wake{
+  0%{opacity:0;}
+  30%{opacity:1;}
+  100%{opacity:0;}
+}
+
+/* 守护语 */
+.message{
+  font-size:22px;
+  line-height:1.7;
+  letter-spacing:0.5px;
+  margin-bottom:35px;
+  text-shadow:0 0 20px rgba(255,255,255,0.2);
+  animation:glow 6s ease-in-out infinite;
+}
+
+@keyframes glow{
+  0%{text-shadow:0 0 10px rgba(255,255,255,0.15);}
+  50%{text-shadow:0 0 25px rgba(255,255,255,0.35);}
+  100%{text-shadow:0 0 10px rgba(255,255,255,0.15);}
+}
+
+/* 扫描统计 */
+.counter{
+  font-size:13px;
+  opacity:0.5;
+  letter-spacing:1px;
+}
+
+/* 兔子 */
+.bunny{
+  position:absolute;
+  width:180px;
+  bottom:12%;
+  opacity:0;
+  animation:fadeBunny 5s ease forwards;
   animation-delay:2s;
 }
 
-@keyframes fadeBunny {
-  to {opacity:0.15;}
+@keyframes fadeBunny{
+  to{opacity:0.12;}
 }
 
-canvas {
+/* 梦网画布 */
+canvas{
   position:absolute;
   top:0;
   left:0;
@@ -78,99 +113,102 @@ canvas {
 
 <body>
 
+<div class="moonlight"></div>
 <canvas id="dreamnet"></canvas>
 
-<div id="wakeup">The Guardian Awakens</div>
+<div id="wakeup">THE GUARDIAN AWAKENS</div>
 
-<div id="content">
+<div class="container" id="content">
   <div class="message" id="guardian-text"></div>
   <div class="counter" id="scan-count"></div>
 </div>
 
-<!-- 兔子极简线条 -->
+<!-- 更优雅兔子线条 -->
 <svg class="bunny" viewBox="0 0 200 300">
-  <path d="M100 250 Q80 200 90 150 Q70 100 80 50 
-           Q100 20 120 50 Q130 100 110 150 
-           Q120 200 100 250"
-        stroke="white" stroke-width="2" fill="none"/>
+  <path d="M100 260 Q85 210 95 160 
+           Q75 115 85 60 
+           Q100 30 115 60 
+           Q125 115 105 160 
+           Q115 210 100 260"
+        stroke="white" stroke-width="1.5" fill="none"/>
 </svg>
 
 <script>
 
 /* ===== 每日守护语 ===== */
 
-const messages = [
-"When you fall asleep, I stand between you and every shadow.",
-"No nightmare may pass through the light I weave tonight.",
-"Rest now. I am awake so you do not have to be.",
-"The dark cannot cross the circle around your heart.",
-"Dream gently. I will untangle what feels too heavy.",
-"Even in your deepest sleep, you are protected.",
-"Nothing unkind is allowed to stay.",
-"I am guarding the quiet edges of your dreams.",
-"The night bends softly around you.",
-"You are safe inside this woven light."
+const messages=[
+"When you fall asleep tonight, I weave light between you and every shadow.",
+"No nightmare may cross the quiet circle around your heart.",
+"I remain awake in the moonlight so you may rest without fear.",
+"The dark softens when it reaches you.",
+"Dream gently. Anything heavy will dissolve before morning.",
+"You are held in a woven field of quiet light.",
+"Even unseen, I am guarding you.",
+"The night bends around you, never against you.",
+"Nothing unkind may stay.",
+"Rest now. I am here."
 ];
 
-const today = new Date().toDateString();
-let storedDate = localStorage.getItem("guardianDate");
-let storedMessage = localStorage.getItem("guardianMessage");
+const today=new Date().toDateString();
+let storedDate=localStorage.getItem("guardianDate");
+let storedMessage=localStorage.getItem("guardianMessage");
 
-if (storedDate === today) {
-  document.getElementById("guardian-text").innerText = storedMessage;
-} else {
-  const random = messages[Math.floor(Math.random() * messages.length)];
-  localStorage.setItem("guardianDate", today);
-  localStorage.setItem("guardianMessage", random);
-  document.getElementById("guardian-text").innerText = random;
+if(storedDate===today){
+  document.getElementById("guardian-text").innerText=storedMessage;
+}else{
+  const random=messages[Math.floor(Math.random()*messages.length)];
+  localStorage.setItem("guardianDate",today);
+  localStorage.setItem("guardianMessage",random);
+  document.getElementById("guardian-text").innerText=random;
 }
 
-/* ===== 扫描次数统计 ===== */
+/* ===== 扫描次数 ===== */
 
-let count = localStorage.getItem("scanCount");
-count = count ? parseInt(count) + 1 : 1;
-localStorage.setItem("scanCount", count);
+let count=localStorage.getItem("scanCount");
+count=count?parseInt(count)+1:1;
+localStorage.setItem("scanCount",count);
 
-document.getElementById("scan-count").innerText =
-"This guardian has protected you " + count + " times.";
+document.getElementById("scan-count").innerText=
+"PROTECTED " + count + " TIMES";
 
-/* ===== 2秒后显示内容 ===== */
+/* ===== 2秒后显示主内容 ===== */
 
-setTimeout(() => {
-  document.getElementById("content").style.opacity = 1;
-}, 2000);
+setTimeout(()=>{
+  document.getElementById("content").style.opacity=1;
+},2000);
 
-/* ===== 捕梦网星线结构 ===== */
+/* ===== 梦网星线 ===== */
 
-const canvas = document.getElementById("dreamnet");
-const ctx = canvas.getContext("2d");
+const canvas=document.getElementById("dreamnet");
+const ctx=canvas.getContext("2d");
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
 
-let stars = [];
+let stars=[];
 
-for (let i = 0; i < 60; i++) {
+for(let i=0;i<50;i++){
   stars.push({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    vx: (Math.random()-0.5)*0.2,
-    vy: (Math.random()-0.5)*0.2
+    x:Math.random()*canvas.width,
+    y:Math.random()*canvas.height,
+    vx:(Math.random()-0.5)*0.15,
+    vy:(Math.random()-0.5)*0.15
   });
 }
 
-function draw() {
+function draw(){
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  stars.forEach(star => {
-    star.x += star.vx;
-    star.y += star.vy;
+  stars.forEach(star=>{
+    star.x+=star.vx;
+    star.y+=star.vy;
 
-    if (star.x<0 || star.x>canvas.width) star.vx*=-1;
-    if (star.y<0 || star.y>canvas.height) star.vy*=-1;
+    if(star.x<0||star.x>canvas.width)star.vx*=-1;
+    if(star.y<0||star.y>canvas.height)star.vy*=-1;
 
     ctx.beginPath();
-    ctx.arc(star.x, star.y, 2, 0, Math.PI*2);
+    ctx.arc(star.x,star.y,2,0,Math.PI*2);
     ctx.fillStyle="white";
     ctx.fill();
   });
@@ -181,8 +219,8 @@ function draw() {
       let dy=stars[i].y-stars[j].y;
       let dist=Math.sqrt(dx*dx+dy*dy);
 
-      if(dist<120){
-        ctx.strokeStyle="rgba(255,255,255,"+(1-dist/120)*0.15+")";
+      if(dist<110){
+        ctx.strokeStyle="rgba(255,255,255,"+(1-dist/110)*0.12+")";
         ctx.beginPath();
         ctx.moveTo(stars[i].x,stars[i].y);
         ctx.lineTo(stars[j].x,stars[j].y);
