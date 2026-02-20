@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guardian Bunny</title>
+<style>
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(circle at center, #f4f1ea, #e8e2d8);
+  font-family: 'Cormorant Garamond', serif;
+  text-align: center;
+  padding: 30px;
+}
+
+.message {
+  font-size: 24px;
+  color: #5e5a54;
+  line-height: 1.6;
+  animation: fadeIn 2s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="message" id="guardian-text"></div>
+
+<script>
+const messages = [
+  "Sleep gently. I am here with you.",
+  "No nightmare may pass tonight.",
+  "You are protected, even in the dark.",
+  "Rest now. I will keep watch.",
+  "Anything unkind will fade before it reaches you.",
+  "Let the night be soft around you.",
+  "You are safe inside this quiet circle.",
+  "Dream freely. I am holding the edges.",
+  "Nothing heavy is allowed to stay.",
+  "Close your eyes without fear."
+];
+
+const random = messages[Math.floor(Math.random() * messages.length)];
+document.getElementById("guardian-text").innerText = random;
+</script>
+
+</body>
+</html>
